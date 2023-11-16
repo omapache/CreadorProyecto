@@ -1830,7 +1830,7 @@ for /L %%i in (1, 1, %numEntities%) do (
     echo ^}
 ) >> "%DIR_EJECUCION%\%folderName%\Profiles\MappingProfiles.cs"
 echo Gracias por usar nuestro Creador de proyectos!
-echo Echo por Omapache 
+echo Echo por Omapache 🦝
 pause
 exit
 ENDLOCAL
