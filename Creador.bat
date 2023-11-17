@@ -1946,26 +1946,26 @@ for /L %%i in (1, 1, %numEntities%) do (
     echo ^}
 ) >> "%DIR_EJECUCION%\%folderName%\Profiles\MappingProfiles.cs"
 (
-    echo <Project Sdk="Microsoft.NET.Sdk">
+    echo ^<Project Sdk="Microsoft.NET.Sdk"^>
     echo.
-    echo <ItemGroup>
-    echo     <None Include="Data\Csv\**" CopyToOutputDirectory="PreserveNewest" /> 
-    echo     <ProjectReference Include="..\Dominio\Dominio.csproj" />
-    echo </ItemGroup>
+    echo ^<ItemGroup^>
+    echo     ^<None Include="Data\Csv\**" CopyToOutputDirectory="PreserveNewest" /^> 
+    echo     ^<ProjectReference Include="..\Dominio\Dominio.csproj" /^>
+    echo ^</ItemGroup^>
     echo.
-    echo <ItemGroup>
-    echo     <PackageReference Include="CsvHelper" Version="30.0.1" />
-    echo     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.12" />
-    echo     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="7.0.0" />
-    echo </ItemGroup>
+    echo ^<ItemGroup^>
+    echo     ^<PackageReference Include="CsvHelper" Version="30.0.1" /^>
+    echo     ^<PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.12" /^>
+    echo     ^<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="7.0.0" /^>
+    echo ^</ItemGroup^>
     echo.
-    echo <PropertyGroup>
-    echo     <TargetFramework>net7.0</TargetFramework>
-    echo     <ImplicitUsings>enable</ImplicitUsings>
-    echo     <Nullable>enable</Nullable>
-    echo </PropertyGroup>
+    echo ^<PropertyGroup^>
+    echo     ^<TargetFramework^>net7.0^</TargetFramework^>
+    echo     ^<ImplicitUsings^>enable^</ImplicitUsings^>
+    echo     ^<Nullable^>enable^</Nullable^>
+    echo ^</PropertyGroup^>
     echo.
-    echo </Project>
+    echo ^</Project^>
 
 
 ) > "%DIR_EJECUCION%\%persistencia%\Persistencia.csproj"
