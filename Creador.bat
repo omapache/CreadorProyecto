@@ -13,7 +13,7 @@ set misProyectos=""
 echo Nota de Recomendación:
 echo - El nombre del proyecto no debe contener símbolos.
 echo - Evite usar espacios en blanco.
-echo - No incluir números.
+echo - No incluir numeros.
 echo.
 
 REM Creación del proyecto WebApi
@@ -95,10 +95,8 @@ REM Cambiar el program
 
 ) >> %DIR_EJECUCION%\%folderName%\Program.cs
 (
-
-    echo 		await context.Database.MigrateAsync^(^);
-    echo 		/*await ApiContextSeed.SeedRolesAsync^(context,loggerFactory^);
-    echo 		await ApiContextSeed.SeedAsync^(context,loggerFactory^)*/;
+    echo 		await ApiContextSeed.SeedRolesAsync^(context,loggerFactory^);
+    echo 		await ApiContextSeed.SeedAsync^(context,loggerFactory^);
     echo 	^}
     echo 	catch ^(Exception ex^)
     echo 	^{
@@ -196,6 +194,96 @@ dotnet add !persistencia!\!persistencia!.csproj package CsvHelper --version 30.0
     echo    public DbSet^<RolUsuario^> RolUsuarios ^{ get; set; ^}
     echo    public DbSet^<Usuario^> Usuarios ^{ get; set; ^}
 ) > "%DIR_EJECUCION%\%persistencia%\ApiContext.cs"
+(
+    echo using System.Globalization;
+    echo using System.Reflection;
+    echo using CsvHelper;
+    echo using CsvHelper.Configuration;
+    echo using Dominio.Entities;
+    echo using Microsoft.Extensions.Logging;
+    echo.
+    echo namespace Persistencia;
+    echo public class ApiContextSeed
+    echo ^{
+    echo     public static async Task SeedAsync^(ApiContext context, ILoggerFactory loggerFactory^)
+    echo     ^{
+    echo         try
+    echo         ^{
+    echo             //inicio de las insersiones en la db
+    echo             var ruta = Path.GetDirectoryName^(Assembly.GetExecutingAssembly^(^).Location^);
+    echo.
+    echo             if ^(!context.Usuarios.Any^(^)^)
+    echo             ^{
+    echo                 using ^(var reader = new StreamReader^(ruta + @"/Data/Csv/User.csv"^)^)
+    echo                 ^{
+    echo                     using ^(var csv = new CsvReader^(reader, CultureInfo.InvariantCulture^)^)
+    echo                     ^{
+    echo                         var list = csv.GetRecords^<Usuario^>^(^);
+    echo                         context.Usuarios.AddRange^(list^);
+    echo                         await context.SaveChangesAsync^(^);
+    echo                     ^}
+    echo                 ^}
+    echo.             
+    echo             ^}
+    echo.
+    echo             if ^(!context.RolUsuarios.Any^(^)^)
+    echo             ^{
+    echo                 using ^(var reader = new StreamReader^(ruta + @"\Data\Csv\RoleUser.csv"^)^)
+    echo                 ^{
+    echo                     using ^(var csv = new CsvReader^(reader, new CsvConfiguration^(CultureInfo.InvariantCulture^)
+    echo                     ^{
+    echo                         HeaderValidated = null, // Esto deshabilita la validación de encabezados
+    echo                         MissingFieldFound = null
+    echo                     ^}^)^)
+    echo                     ^{
+    echo                         // Resto de tu código para leer y procesar el archivo CSV
+    echo                         var list = csv.GetRecords^<RolUsuario^>^(^);
+    echo                         List^<RolUsuario^> entidad = new List^<RolUsuario^>^(^);
+    echo                         foreach ^(var item in list^)
+    echo                         ^{
+    echo                             entidad.Add^(new RolUsuario
+    echo                             ^{
+    echo                                 IdUsuarioFk = item.IdUsuarioFk,
+    echo                                 IdRolFk = item.IdRolFk
+    echo                             ^}^);
+    echo                         ^}
+    echo                         context.RolUsuarios.AddRange^(entidad^);
+    echo                         await context.SaveChangesAsync^(^);
+    echo                     ^}
+    echo                 ^}
+    echo             ^}
+    echo         //fin de las insersiones en la db
+    echo         ^}
+    echo         catch ^(Exception ex^)
+    echo         ^{
+    echo             var logger = loggerFactory.CreateLogger^<ApiContext^>(^);
+    echo             logger.LogError^(ex.Message^);
+    echo         ^}
+    echo     ^}
+    echo     public static async Task SeedRolesAsync^(ApiContext context, ILoggerFactory loggerFactory^)
+    echo     ^{
+    echo         try
+    echo         ^{
+    echo             if ^(!context.Roles.Any^(^)^)
+    echo             ^{
+    echo                 var roles = new List^<Rol^>^(^)
+    echo                         ^{
+    echo                             new Rol^{Id=1, Nombre="Administrador"^},
+    echo                             new Rol^{Id=2, Nombre="Empleado"^},
+    echo                         };
+    echo                 context.Roles.AddRange^(roles^);
+    echo                 await context.SaveChangesAsync^(^);
+    echo             ^}
+    echo         ^}
+    echo         catch ^(Exception ex^)
+    echo         ^{
+    echo             var logger = loggerFactory.CreateLogger^<ApiContext^>^(^);
+    echo             logger.LogError^(ex.Message^);
+    echo         ^}
+    echo     ^}
+    echo ^}
+
+) > "%DIR_EJECUCION%\%persistencia%\ApiContextSeed.cs"
 SET dom=Dominio
 dotnet new classlib -o !dom!
 dotnet add !dom!\!dom!.csproj package FluentValidation.AspNetCore --version 11.3.0
@@ -219,7 +307,7 @@ dotnet add reference %DIR_EJECUCION%\%app%\%app%.csproj
 cd %DIR_EJECUCION%\%persistencia%
 dotnet add reference %DIR_EJECUCION%\%dom%\%dom%.csproj
 
-REM Creación de carpetas correspondientes al segundo menú
+REM Creación de carpetas correspondientes al segundo menu
 mkdir %DIR_EJECUCION%\%folderName%\Services
 (
     echo using API.Dtos;
@@ -512,7 +600,7 @@ mkdir %DIR_EJECUCION%\%folderName%\Helpers
     echo             401 =^> "Usuario no autorizado.",
     echo             404 =^> "El recurso que has intentado solicitar no existe.",
     echo             405 =^> "Este método HTTP no está permitido en el servidor.",
-    echo             500 =^> "Error en el servidor. No eres tú, soy yo. Comunícate con el administrador XD.",
+    echo             500 =^> "Error en el servidor. No eres tu, soy yo. Comunícate con el administrador XD.",
     echo             _ =^> throw new NotImplementedException^(^)
     echo         ^};
     echo     ^}
@@ -1573,9 +1661,22 @@ mkdir %DIR_EJECUCION%\%persistencia%\Data\Configuration
     echo ^}
 
 ) > "%DIR_EJECUCION%\%folderName%\Controllers\UsuarioController.cs"
+mkdir %DIR_EJECUCION%\%persistencia%\Data\Csv
+(
+    echo IdUsuarioFk,IdRolFk
+    echo 1,1
+    echo 2,2
+    echo 3,2
+) > "%DIR_EJECUCION%\%persistencia%\Data\Csv\RoleUser.csv"
+(
+    echo Id,Nombre,Email,Password
+    echo 1,admin,admin@example.com,AQAAAAIAAYagAAAAEGi0FjrgCdfzlsJOcti7rJQq1k5DB4Cpr6ICusQEnePc6f78PE1IhgVuIzm6rwMeDA==
+    echo 2,Usuario2,usuario2@example.com,AQAAAAIAAYagAAAAEGi0FjrgCdfzlsJOcti7rJQq1k5DB4Cpr6ICusQEnePc6f78PE1IhgVuIzm6rwMeDA==
+    echo 3,Usuario3,usuario3@example.com,AQAAAAIAAYagAAAAEGi0FjrgCdfzlsJOcti7rJQq1k5DB4Cpr6ICusQEnePc6f78PE1IhgVuIzm6rwMeDA==
+) > "%DIR_EJECUCION%\%persistencia%\Data\Csv\User.csv"
 
-REM Preguntar el número de entidades
-SET /P numEntities="Ingrese el número de entidades: "
+REM Preguntar el numero de entidades
+SET /P numEntities="Ingrese el numero de entidades: "
 
 REM Crear archivos .cs para cada entidad en la carpeta Dominio\Entities
 
@@ -1619,25 +1720,25 @@ for /L %%i in (1, 1, %numEntities%) do (
         echo using Microsoft.EntityFrameworkCore.Metadata.Builders;
         echo.
         echo namespace Persistencia.Data.Configuration;
-        echo public class !entityName!Configuration : IEntityTypeConfiguration<!entityName!> 
-        echo {
-        echo     public void Configure(EntityTypeBuilder<!entityName!> builder)
-        echo     {
+        echo public class !entityName!Configuration : IEntityTypeConfiguration^<!entityName!^> 
+        echo ^{
+        echo     public void Configure^(EntityTypeBuilder^<!entityName!^> builder^)
+        echo     ^{
         echo.
-        echo         builder.ToTable("!entityName!");
-        echo         builder.HasKey(p => p.Id);
+        echo         builder.ToTable^("!entityName!"^);
+        echo         builder.HasKey^(p =^> p.Id^);
         echo.
-        echo         builder.Property(p => p.Id)
-        echo         .IsRequired();
+        echo         builder.Property^(p =^> p.Id^)
+        echo         .IsRequired^(^);
         echo.
-        echo         builder.Property(p => p.Nombre)
-        echo         .HasColumnName("Nombre")
-        echo         .HasColumnType("varchar")
-        echo         .HasMaxLength(255)
-        echo         .IsRequired();
+        echo         builder.Property^(p =^> p.Nombre^)
+        echo         .HasColumnName^("Nombre"^)
+        echo         .HasColumnType^("varchar"^)
+        echo         .HasMaxLength^(255^)
+        echo         .IsRequired^(^);
         echo.
-        echo     }
-        echo }
+        echo     ^}
+        echo ^}
 
     ) >> "%DIR_EJECUCION%\%persistencia%\Data\Configuration\!entityName!Configuration.cs"
 
@@ -1683,7 +1784,7 @@ for /L %%i in (1, 1, %numEntities%) do (
         echo     public override async Task^<!entityName!^> GetByIdAsync^(int id^)
         echo     ^{
         echo         return await _context.!entityName!s
-        echo         .FirstOrDefaultAsync^(p =^>  p.Id ^== id^);
+        echo         .FirstOrDefaultAsync^(p =^>  p.Id ^=^= id^);
         echo     ^}
         echo     public override async Task^<(int totalRegistros, IEnumerable^<!entityName!^> registros^)^> GetAllAsync^(int pageIndez, int pageSize, string search^)
         echo     ^{
@@ -1707,12 +1808,17 @@ for /L %%i in (1, 1, %numEntities%) do (
     (
 		
         echo using API.Dtos;
+        echo using API.Helpers.Errors;
         echo using AutoMapper;
         echo using Dominio.Entities;
         echo using Dominio.Interfaces;
+        echo using Microsoft.AspNetCore.Authorization;
         echo using Microsoft.AspNetCore.Mvc;
         echo.
         echo namespace API.Controllers;
+        echo ^[ApiVersion^("1.0"^)^]
+        echo ^[ApiVersion^("1.1"^)^]
+        echo ^[Authorize^]
         echo.
         echo public class !entityName!Controller : BaseApiController
         echo ^{
@@ -1725,20 +1831,30 @@ for /L %%i in (1, 1, %numEntities%) do (
         echo         this.mapper = mapper;
         echo     ^}
         echo.
-        echo     [HttpGet]
-        echo     [ProducesResponseType^(StatusCodes.Status200OK^)]
-        echo     [ProducesResponseType^(StatusCodes.Status400BadRequest^)]
+        echo     ^[HttpGet^]
+        echo     ^[ProducesResponseType^(StatusCodes.Status200OK^)^]
+        echo     ^[ProducesResponseType^(StatusCodes.Status400BadRequest^)^]
         echo.
         echo     public async Task^<ActionResult^<IEnumerable^<!entityName!Dto^>^>^> Get^(^)
         echo     ^{
         echo         var !entityName! = await unitofwork.!entityName!s.GetAllAsync^(^);
         echo         return mapper.Map^<List^<!entityName!Dto^>^>^(!entityName!^);
         echo     ^}
+        echo    ^[HttpGet^]
+        echo    ^[MapToApiVersion^("1.1"^)^]
+        echo    ^[ProducesResponseType^(StatusCodes.Status200OK^)^]
+        echo    ^[ProducesResponseType^(StatusCodes.Status400BadRequest^)^]
+        echo    public async Task^<ActionResult^<Pager^<RolDto^>^>^> GetPagination^(^[FromQuery^] Params paisParams^)
+        echo    ^{
+        echo        var entidad = await unitofwork.Roles.GetAllAsync^(paisParams.PageIndex, paisParams.PageSize, paisParams.Search^);
+        echo        var listEntidad = mapper.Map^<List^<RolDto^>^>^(entidad.registros^);
+        echo        return new Pager^<RolDto^>^(listEntidad, entidad.totalRegistros, paisParams.PageIndex, paisParams.PageSize, paisParams.Search^);
+        echo    ^}
         echo.
-        echo     [HttpGet^("{id}"^)]
-        echo     [ProducesResponseType^(StatusCodes.Status200OK^)]
-        echo     [ProducesResponseType^(StatusCodes.Status400BadRequest^)]
-        echo     [ProducesResponseType^(StatusCodes.Status404NotFound^)]
+        echo     ^[HttpGet^("{id}"^)^]
+        echo     ^[ProducesResponseType^(StatusCodes.Status200OK^)^]
+        echo     ^[ProducesResponseType^(StatusCodes.Status400BadRequest^)^]
+        echo     ^[ProducesResponseType^(StatusCodes.Status404NotFound^)^]
         echo.
         echo     public async Task^<ActionResult^<!entityName!Dto^>^> Get^(int id^)
         echo     ^{
@@ -1749,9 +1865,9 @@ for /L %%i in (1, 1, %numEntities%) do (
         echo         return this.mapper.Map^<!entityName!Dto^>^(!entityName!^);
         echo     ^}
         echo.
-        echo     [HttpPost]
-        echo     [ProducesResponseType^(StatusCodes.Status201Created^)]
-        echo     [ProducesResponseType^(StatusCodes.Status400BadRequest^)]
+        echo     ^[HttpPost^]
+        echo     ^[ProducesResponseType^(StatusCodes.Status201Created^)^]
+        echo     ^[ProducesResponseType^(StatusCodes.Status400BadRequest^)^]
         echo.
         echo     public async Task^<ActionResult^<!entityName!^>^> Post^(!entityName!Dto !entityName!Dto^)
         echo     ^{
@@ -1766,12 +1882,12 @@ for /L %%i in (1, 1, %numEntities%) do (
         echo         return CreatedAtAction^(nameof^(Post^), new ^{id = !entityName!Dto.Id^}, !entityName!Dto^);
         echo     ^}
         echo.
-        echo     [HttpPut^("{id}"^)]
-        echo     [ProducesResponseType^(StatusCodes.Status200OK^)]
-        echo     [ProducesResponseType^(StatusCodes.Status400BadRequest^)]
-        echo     [ProducesResponseType^(StatusCodes.Status404NotFound^)]
+        echo     ^[HttpPut^("{id}"^)^]
+        echo     ^[ProducesResponseType^(StatusCodes.Status200OK^)^]
+        echo     ^[ProducesResponseType^(StatusCodes.Status400BadRequest^)^]
+        echo     ^[ProducesResponseType^(StatusCodes.Status404NotFound^)^]
         echo.
-        echo     public async Task^<ActionResult^<!entityName!Dto^>^> Put^(int id, [FromBody]!entityName!Dto !entityName!Dto^)^{
+        echo     public async Task^<ActionResult^<!entityName!Dto^>^> Put^(int id, ^[FromBody^]!entityName!Dto !entityName!Dto^)^{
         echo         if^(!entityName!Dto == null^)
         echo         ^{
         echo             return NotFound^(^);
@@ -1782,9 +1898,9 @@ for /L %%i in (1, 1, %numEntities%) do (
         echo         return !entityName!Dto;
         echo     ^}
         echo.
-        echo     [HttpDelete^("{id}"^)]
-        echo     [ProducesResponseType^(StatusCodes.Status204NoContent^)]
-        echo     [ProducesResponseType^(StatusCodes.Status404NotFound^)]
+        echo     ^[HttpDelete^("{id}"^)^]
+        echo     ^[ProducesResponseType^(StatusCodes.Status204NoContent^)^]
+        echo     ^[ProducesResponseType^(StatusCodes.Status404NotFound^)^]
         echo.
         echo     public async Task^<IActionResult^> Delete^(int id^)^{
         echo         var !entityName! = await unitofwork.!entityName!s.GetByIdAsync^(id^);
@@ -1829,8 +1945,32 @@ for /L %%i in (1, 1, %numEntities%) do (
     echo    ^}
     echo ^}
 ) >> "%DIR_EJECUCION%\%folderName%\Profiles\MappingProfiles.cs"
+(
+    echo <Project Sdk="Microsoft.NET.Sdk">
+    echo.
+    echo <ItemGroup>
+    echo     <None Include="Data\Csv\**" CopyToOutputDirectory="PreserveNewest" /> 
+    echo     <ProjectReference Include="..\Dominio\Dominio.csproj" />
+    echo </ItemGroup>
+    echo.
+    echo <ItemGroup>
+    echo     <PackageReference Include="CsvHelper" Version="30.0.1" />
+    echo     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.12" />
+    echo     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="7.0.0" />
+    echo </ItemGroup>
+    echo.
+    echo <PropertyGroup>
+    echo     <TargetFramework>net7.0</TargetFramework>
+    echo     <ImplicitUsings>enable</ImplicitUsings>
+    echo     <Nullable>enable</Nullable>
+    echo </PropertyGroup>
+    echo.
+    echo </Project>
+
+
+) > "%DIR_EJECUCION%\%persistencia%\Persistencia.csproj"
 echo Gracias por usar nuestro Creador de proyectos!
-echo Echo por Omapache 🦝
+echo Echo por Omapache 
 pause
 exit
 ENDLOCAL
