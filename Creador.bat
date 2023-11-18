@@ -10,7 +10,7 @@ for %%I in (%DIR_EJECUCION%) do set nombreCarpeta=%%~nxI
 REM Inicializa una variable para el arreglo vacío
 set misProyectos=""
 
-echo Nota de Recomendación:
+echo Nota de Recomendacion:
 echo - El nombre del proyecto no debe contener símbolos.
 echo - Evite usar espacios en blanco.
 echo - No incluir numeros.
@@ -599,7 +599,7 @@ mkdir %DIR_EJECUCION%\%folderName%\Helpers
     echo             400 =^> "Has realizado una petición incorrecta.",
     echo             401 =^> "Usuario no autorizado.",
     echo             404 =^> "El recurso que has intentado solicitar no existe.",
-    echo             405 =^> "Este método HTTP no está permitido en el servidor.",
+    echo             405 =^> "Este método HTTP no estapermitido en el servidor.",
     echo             500 =^> "Error en el servidor. No eres tu, soy yo. Comunícate con el administrador XD.",
     echo             _ =^> throw new NotImplementedException^(^)
     echo         ^};
@@ -1844,11 +1844,11 @@ for /L %%i in (1, 1, %numEntities%) do (
         echo    ^[MapToApiVersion^("1.1"^)^]
         echo    ^[ProducesResponseType^(StatusCodes.Status200OK^)^]
         echo    ^[ProducesResponseType^(StatusCodes.Status400BadRequest^)^]
-        echo    public async Task^<ActionResult^<Pager^<RolDto^>^>^> GetPagination^(^[FromQuery^] Params paisParams^)
+        echo    public async Task^<ActionResult^<Pager^<!entityName!Dto^>^>^> GetPagination^(^[FromQuery^] Params EntidadParams^)
         echo    ^{
-        echo        var entidad = await unitofwork.Roles.GetAllAsync^(paisParams.PageIndex, paisParams.PageSize, paisParams.Search^);
-        echo        var listEntidad = mapper.Map^<List^<RolDto^>^>^(entidad.registros^);
-        echo        return new Pager^<RolDto^>^(listEntidad, entidad.totalRegistros, paisParams.PageIndex, paisParams.PageSize, paisParams.Search^);
+        echo        var entidad = await unitofwork.!entityName!es.GetAllAsync^(EntidadParams.PageIndex, EntidadParams.PageSize, EntidadParams.Search^);
+        echo        var listEntidad = mapper.Map^<List^<!entityName!Dto^>^>^(entidad.registros^);
+        echo        return new Pager^<RolDto^>^(listEntidad, entidad.totalRegistros, EntidadParams.PageIndex, EntidadParams.PageSize, EntidadParams.Search^);
         echo    ^}
         echo.
         echo     ^[HttpGet^("{id}"^)^]
