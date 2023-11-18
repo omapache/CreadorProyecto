@@ -7,7 +7,7 @@ en 2 archivos faltan poner una informacion que no he logrado corregir entonces s
 
 en Params de la carpeta Helpers en la linea 23 "set => _search = ( "";" deber de ser "set => _search = (!string.IsNullOrEmpty(value))? value.ToLower(): "";"
 
-en el UserService en la linea en la linea 114 "if (rolExists = null)" deberia de ser if "(rolExists != null)"
+en el UserService en la linea en la linea 114 "if (rolExists = null)" deberia de ser "if (rolExists != null)"
 ## Características 🌟
 
 - creacion de entidades, interfaces, repositorios, dtos, controllers, unidad de trabajo, apiContext
